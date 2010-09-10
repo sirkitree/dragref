@@ -1,0 +1,85 @@
+<?php
+
+include_once('dragref.features.inc');
+
+/**
+ * Implementation of hook_menu().
+ */
+function dragref_menu() {
+  $items = array();
+  
+  $items['admin/settings/dragref'] = array(
+    'title' => t('DragRef settings'),
+    'description' => t('Configure your dragref settings.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dragref_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'dragref.admin.inc',
+  );
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_views_defautl_views_alter().
+ *
+ * Alter the views relationship, argument, filter based on our settings form.
+ */
+function dragref_views_default_views_alter(&$views) {
+  if (isset($views['dragref_content_refs'])) {
+    list($parent, $child, $field) = dragref_variable_get();
+
+    /* Relationship: Content: Page (field_page_ref) */
+    // unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
+    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['id'] = $field;
+    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['table'] = 'node_data_' . str_replace('nid', '', $field);
+    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['field'] = $field;
+    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['required'] = 0;
+
+    /* Argument: Node: Nid */
+    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field;
+    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
+      $parent => $parent,
+    );
+
+    /* Filter: Node: Type */
+    $views['dragref_content_refs']->display['default']->display_options['filters']['type']['value'] = array(
+      $child => $child,
+    );
+    dsm($views['dragref_content_refs']);
+  }
+}
+
+/**
+ * Implementation of hook_ctools_render_alter().
+ */
+// function dragref_ctools_render_alter(&$info, &$page, &$args, &$contexts, &$task, &$subtask, &$handler) {
+//   if ($handler->task == 'node_view') {
+//     $parent = variable_get('dragref_parent', 'page');
+//     $child = variable_get('dragref_child', 'story');
+//     $field = variable_get('dragref_child_field', 'field_page_ref');
+//     
+//     $conf = $handler->conf;
+//     $conf['access']['plugins'][0]['settings']['type'] = drupal_map_assoc(array($parent));
+//     $conf['display']->content[5]->configuration['body'] = "<a href=\"/node/add/$child/%node:nid\" class=\"dragref-modal\">Add new $child</a> <?php automodal_add('.dragref-modal', array('automodalReload' => TRUE));
+// 
+//     $handler->conf = $conf;
+//   }
+// }
+
+function dragref_default_page_manager_handlers_alter(&$cache) {
+  if (isset($cache['node_view_panel_context'])) {
+    list($parent, $child, $field) = dragref_variable_get();
+
+    $cache['node_view_panel_context']->conf['access']['plugins'][0]['settings']['type'] = drupal_map_assoc(array($parent));
+    $cache['node_view_panel_context']->conf['display']->content['new-2']->configuration['body'] = "<a href=\"/node/add/$child/%node:nid\" class=\"dragref-modal\">Add new $child</a><?php automodal_add('.dragref-modal', array('automodalReload' => TRUE));?>";
+dsm($cache);
+  }
+}
+function dragref_variable_get() {
+  $parent = variable_get('dragref_parent', 'page');
+  $child = variable_get('dragref_child', 'story');
+  $field = variable_get('dragref_child_field', 'field_page_ref');
+  return array($parent, $child, $field);
+}
