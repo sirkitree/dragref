@@ -31,23 +31,25 @@ function dragref_views_default_views_alter(&$views) {
     list($parent, $child, $field) = dragref_variable_get();
 
     /* Relationship: Content: Page (field_page_ref) */
-    // unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
-    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['id'] = $field;
-    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['table'] = 'node_data_' . str_replace('nid', '', $field);
-    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['field'] = $field;
-    $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['required'] = 0;
+    if ($field !== 'field_page_ref') {
+      // unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
+      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['id'] = $field;
+      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['table'] = 'node_data_' . str_replace('nid', '', $field);
+      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['field'] = $field;
+      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['required'] = 0;
 
-    /* Argument: Node: Nid */
-    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field;
-    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
-      $parent => $parent,
-    );
+      /* Argument: Node: Nid */
+      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field;
+      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
+        $parent => $parent,
+      );
 
-    /* Filter: Node: Type */
-    $views['dragref_content_refs']->display['default']->display_options['filters']['type']['value'] = array(
-      $child => $child,
-    );
-    dsm($views['dragref_content_refs']);
+      /* Filter: Node: Type */
+      $views['dragref_content_refs']->display['default']->display_options['filters']['type']['value'] = array(
+        $child => $child,
+      );
+    }
+    //dsm($views['dragref_content_refs']);
   }
 }
 
@@ -74,7 +76,8 @@ function dragref_default_page_manager_handlers_alter(&$cache) {
 
     $cache['node_view_panel_context']->conf['access']['plugins'][0]['settings']['type'] = drupal_map_assoc(array($parent));
     $cache['node_view_panel_context']->conf['display']->content['new-2']->configuration['body'] = "<a href=\"/node/add/$child/%node:nid\" class=\"dragref-modal\">Add new $child</a><?php automodal_add('.dragref-modal', array('automodalReload' => TRUE));?>";
-dsm($cache);
+    
+    // dsm($cache);
   }
 }
 function dragref_variable_get() {
