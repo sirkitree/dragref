@@ -59,6 +59,10 @@ function dragref_views_default_views() {
       'separator' => '',
     ),
   );
+  $handler->display->display_options['style_options']['tabledrag_order'] = array(
+    'field' => 'value0',
+    'handler' => 'native',
+  );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
   /* Relationship: Content: Page (field_page_ref) */

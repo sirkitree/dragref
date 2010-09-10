@@ -30,16 +30,16 @@ function dragref_views_default_views_alter(&$views) {
   if (isset($views['dragref_content_refs'])) {
     list($parent, $child, $field) = dragref_variable_get();
 
-    /* Relationship: Content: Page (field_page_ref) */
     if ($field !== 'field_page_ref') {
-      // unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
-      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['id'] = $field;
-      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['table'] = 'node_data_' . str_replace('nid', '', $field);
-      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['field'] = $field;
-      $views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']['required'] = 0;
+      /* Relationship: Content: Page (field_page_ref) */
+      unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
+      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['id'] = $field .'_nid';
+      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['table'] = 'node_data_'.$field;
+      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['field'] = $field .'_nid';
+      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['required'] = 0;
 
       /* Argument: Node: Nid */
-      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field;
+      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field .'_nid';
       $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
         $parent => $parent,
       );
