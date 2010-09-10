@@ -30,56 +30,43 @@ function dragref_views_default_views_alter(&$views) {
   if (isset($views['dragref_content_refs'])) {
     list($parent, $child, $field) = dragref_variable_get();
 
-    if ($field !== 'field_page_ref') {
-      /* Relationship: Content: Page (field_page_ref) */
-      unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
-      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['id'] = $field .'_nid';
-      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['table'] = 'node_data_'.$field;
-      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['field'] = $field .'_nid';
-      $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['required'] = 0;
+    /* Relationship: Content: Page (field_page_ref) */
+    unset($views['dragref_content_refs']->display['default']->display_options['relationships']['field_page_ref_nid']);
+    $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['id'] = $field .'_nid';
+    $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['table'] = 'node_data_'.$field;
+    $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['field'] = $field .'_nid';
+    $views['dragref_content_refs']->display['default']->display_options['relationships'][$field .'_nid']['required'] = 0;
 
-      /* Argument: Node: Nid */
-      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field .'_nid';
-      $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
-        $parent => $parent,
-      );
+    /* Argument: Node: Nid */
+    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['relationship'] = $field .'_nid';
+    $views['dragref_content_refs']->display['default']->display_options['arguments']['nid']['validate_options']['types'] = array(
+      $parent => $parent,
+    );
 
-      /* Filter: Node: Type */
-      $views['dragref_content_refs']->display['default']->display_options['filters']['type']['value'] = array(
-        $child => $child,
-      );
-    }
-    //dsm($views['dragref_content_refs']);
+    /* Filter: Node: Type */
+    $views['dragref_content_refs']->display['default']->display_options['filters']['type']['value'] = array(
+      $child => $child,
+    );
+
   }
 }
 
 /**
- * Implementation of hook_ctools_render_alter().
+ * Implementation of hook_default_page_manager_handlers_alter().
  */
-// function dragref_ctools_render_alter(&$info, &$page, &$args, &$contexts, &$task, &$subtask, &$handler) {
-//   if ($handler->task == 'node_view') {
-//     $parent = variable_get('dragref_parent', 'page');
-//     $child = variable_get('dragref_child', 'story');
-//     $field = variable_get('dragref_child_field', 'field_page_ref');
-//     
-//     $conf = $handler->conf;
-//     $conf['access']['plugins'][0]['settings']['type'] = drupal_map_assoc(array($parent));
-//     $conf['display']->content[5]->configuration['body'] = "<a href=\"/node/add/$child/%node:nid\" class=\"dragref-modal\">Add new $child</a> <?php automodal_add('.dragref-modal', array('automodalReload' => TRUE));
-// 
-//     $handler->conf = $conf;
-//   }
-// }
-
 function dragref_default_page_manager_handlers_alter(&$cache) {
   if (isset($cache['node_view_panel_context'])) {
     list($parent, $child, $field) = dragref_variable_get();
 
     $cache['node_view_panel_context']->conf['access']['plugins'][0]['settings']['type'] = drupal_map_assoc(array($parent));
     $cache['node_view_panel_context']->conf['display']->content['new-2']->configuration['body'] = "<a href=\"/node/add/$child/%node:nid\" class=\"dragref-modal\">Add new $child</a><?php automodal_add('.dragref-modal', array('automodalReload' => TRUE));?>";
-    
-    // dsm($cache);
+
   }
 }
+
+/**
+ * Helper function for variables.
+ */
 function dragref_variable_get() {
   $parent = variable_get('dragref_parent', 'page');
   $child = variable_get('dragref_child', 'story');
