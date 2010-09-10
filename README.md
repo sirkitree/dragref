@@ -27,5 +27,4 @@ Instructions
 
 Known bugs
 ----------
-* There is currently a bug with altering the default view provided.
 * We should check to make sure that the child noderef point to the parent.
